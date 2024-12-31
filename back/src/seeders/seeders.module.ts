@@ -7,11 +7,13 @@ import { Categories } from 'src/entities/categoris.entities';
 import { Products } from 'src/entities/products.enties';
 import { CategoriesModule } from 'src/categories/categories.module';
 import { ProductsModule } from 'src/products/products.module';
+import { UserModule } from 'src/users/user.module';
 
 @Module({
   imports:[
     CategoriesModule,
-    ProductsModule
+    ProductsModule,
+    UserModule,
   ],
   providers: [SeedersService],
   exports: [SeedersService],

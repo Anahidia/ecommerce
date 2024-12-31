@@ -1,0 +1,36 @@
+[
+    {
+      "name": "Anahi Diaz",
+      "email": "anahidiaz@gmail.com",
+      "password": "Password123!",
+      "confirmPassword": "Password123!",
+      "address": "calleFalsa123",
+      "phone": 1234567890,
+      "country": "Argentina",
+      "city": "Concordia",
+      "isAdmin": true
+    },
+    {
+      "name": "Ana Gomez",
+      "email": "ana@example.com",
+      "password": "AnaPass123!",
+      "confirmPassword": "AnaPass123!",
+      "address": "456 Another St",
+      "phone": 987654321,
+      "country": "Mexico",
+      "city": "Guadalajara",
+      "isAdmin": false
+    },
+    {
+      "name": "Admin User",
+      "email": "admin@example.com",
+      "password": "AdminPass123!",
+      "confirmPassword": "AdminPass123!",
+      "address": "789 Admin Blvd",
+      "phone": 1231231234,
+      "country": "USA",
+      "city": "New York",
+      "isAdmin": false
+    }
+  ]
+  
