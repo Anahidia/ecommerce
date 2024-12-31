@@ -35,7 +35,8 @@ export class Users {
 
     @ApiProperty({ description: 'Address of the user', type: String })
     @Column({
-        type: "text"
+        type: "text",
+        nullable: true,
     })
     address: string;
 
@@ -48,7 +49,8 @@ export class Users {
     @ApiProperty({ description: 'Country of the user', type: String })
     @Column({
         length: 50,
-        type: "varchar"
+        type: "varchar",
+        nullable: true,
     })
     country: string;
 
@@ -56,6 +58,7 @@ export class Users {
     @Column({
         type: "varchar",
         length: 50,
+        nullable: true,
     })
     city: string;
 
@@ -64,7 +67,7 @@ export class Users {
         type: "boolean",
         default: false
     })
-    isadmin: boolean;
+    isAdmin: boolean;
 
     @ApiProperty({ description: 'Google ID of the user', type: String, required: false })
     @Column({
@@ -74,12 +77,24 @@ export class Users {
     })
     googleId: string;
 
-    @ApiProperty({ description: 'Authentication provider of the user', type: String, default: 'local' })
     @Column({
-        type: "varchar",
-        default: "local" // Alternativas: "google", "facebook", etc.
-    })
-    authProvider: string;
+        type: 'varchar',
+        length: 16,
+        nullable: false,
+        default: 'form',
+      })
+// @ApiProperty({
+//     description: 'Authentication method used by the user',
+//     enum: ['google', 'googleIncomplete', 'form'],
+//     default: 'form',
+//   })
+//   auth: 'google' | 'googleIncomplete' | 'form'
+//     @ApiProperty({ description: 'Authentication provider of the user', type: String, default: 'local' })
+//     @Column({
+//         type: "varchar",
+//         default: "local" // Alternativas: "google", "facebook", etc.
+//     })
+//     authProvider: string;
 
     @ApiProperty({ description: 'Orders associated with the user', type: () => [Orders] })
     @OneToMany(() => Orders, (orders) => orders.user)

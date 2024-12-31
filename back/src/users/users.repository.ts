@@ -13,21 +13,28 @@ export class UserRepository {
   // Obtener todos los usuarios con paginación
   async getUsers(page: number, limit: number) {
     const skip = (page - 1) * limit;
-    const users = await this.usersRepository.find({
+    const [users, total] = await this.usersRepository.findAndCount({
       take: limit,
-      skip: skip,
+      skip,
     });
-    return users.map(({ password, ...userNoPassword }) => userNoPassword);
+
+    return {
+      total,
+      page,
+      limit,
+      users: users.map(({ password, ...userNoPassword }) => userNoPassword),
+    };
   }
 
   // Obtener usuario por correo electrónico
   async getUsersByEmail(email: string) {
     const user = await this.usersRepository.findOne({ where: { email } });
+    if (!user) throw new NotFoundException(`Usuario con email ${email} no encontrado`);
     return user;
   }
 
   // Obtener usuario por Google ID
-  async getUsersByGoogleId(googleId: string) {
+  async getUserByGoogleId(googleId: string) {
     const user = await this.usersRepository.findOne({ where: { googleId } });
     if (!user) throw new NotFoundException(`Usuario con Google ID ${googleId} no encontrado`);
     return user;
@@ -37,9 +44,7 @@ export class UserRepository {
   async getUserById(id: string) {
     const user = await this.usersRepository.findOne({
       where: { id },
-      relations: {
-        orders: true, // Relación de órdenes si es necesario
-      },
+      relations: { orders: true }, // Relación de órdenes si es necesario
     });
     if (!user) throw new NotFoundException(`Usuario con id ${id} no encontrado`);
 
@@ -48,8 +53,7 @@ export class UserRepository {
   }
 
   // Crear un nuevo usuario
-  async createUser(user: Partial<Users>): Promise<Partial<Users>> {
-    // Verificación de existencia de usuario por email
+  async createUser(user: Partial<Users>) {
     const existingUser = await this.usersRepository.findOne({ where: { email: user.email } });
     if (existingUser) throw new ForbiddenException('Ya existe un usuario con ese correo electrónico');
 
@@ -63,31 +67,29 @@ export class UserRepository {
   }
 
   // Asignar un rol de admin a un usuario
-  async createdAdmin(email: string, currentUserId: string) {
+  async assignAdminRole(email: string, currentUserId: string) {
     const currentUser = await this.usersRepository.findOne({ where: { id: currentUserId } });
-    if (!currentUser || !currentUser.isadmin) {
+    if (!currentUser || !currentUser.isAdmin) {
       throw new ForbiddenException('No tienes permisos para asignar roles de admin');
     }
 
     const userToUpdate = await this.usersRepository.findOne({ where: { email } });
-    if (!userToUpdate) {
-      throw new NotFoundException('Usuario no encontrado');
-    }
+    if (!userToUpdate) throw new NotFoundException('Usuario no encontrado');
+    if (userToUpdate.isAdmin) throw new ForbiddenException('Este usuario ya es administrador');
 
-    if (userToUpdate.isadmin) {
-      throw new ForbiddenException('Este usuario ya es administrador');
-    }
-
-    userToUpdate.isadmin = true;
+    userToUpdate.isAdmin = true;
     return await this.usersRepository.save(userToUpdate);
   }
 
   // Actualizar usuario
-  async updateUser(id: string, upUser: Users): Promise<Partial<Users>> {
-    const updatedUser = await this.usersRepository.findOne({ where: { id } });
-    if (!updatedUser) throw new NotFoundException(`Usuario con id ${id} no encontrado`);
+  async updateUser(id: string, upUser: Partial<Users>): Promise<Partial<Users>> {
+    const existingUser = await this.usersRepository.findOne({ where: { id } });
+    if (!existingUser) throw new NotFoundException(`Usuario con id ${id} no encontrado`);
 
     await this.usersRepository.update(id, upUser);
+    const updatedUser = await this.usersRepository.findOne({ where: { id } });
+    if (!updatedUser) throw new NotFoundException(`Usuario con id ${id} no encontrado tras la actualización`);
+
     const { password, ...userWithoutPassword } = updatedUser;
     return userWithoutPassword;
   }

@@ -14,7 +14,7 @@ export class UsersService {
  return this.UsersRepository.createUser(user)
   }
   async createAdminService(email:string,currentUserId:string){
-  return this.UsersRepository.createdAdmin(email,currentUserId)
+  return this.UsersRepository.assignAdminRole(email,currentUserId)
   }
   updateUserService(id:string, upUser){
 return this.UsersRepository.updateUser(id,upUser)
