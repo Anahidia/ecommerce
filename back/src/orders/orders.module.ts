@@ -11,6 +11,7 @@ import { ordersRepository } from './orders.repository';
 @Module({
   imports:[TypeOrmModule.forFeature([Orders,OrderDetails,Users,Products])],
   controllers: [OrdersController],
-  providers: [OrdersService,ordersRepository]
+  providers: [OrdersService,ordersRepository],
+  exports:[ordersRepository]
 })
 export class OrdersModule {}

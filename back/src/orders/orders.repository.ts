@@ -5,7 +5,9 @@ import { OrderDetails } from 'src/entities/orderDetails.entities';
 import { Orders } from 'src/entities/orders.entities';
 import { Products } from 'src/entities/products.enties';
 import { Users } from 'src/entities/user.entities';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class ordersRepository{
@@ -24,6 +26,40 @@ export class ordersRepository{
 
     ){}
 
+
+    // async seedOrders() {
+    //     try {
+    //       const users = await this.usersRepository.find();
+    //       const dataPath = path.join(__dirname, '../utils/ordersSeeder.json');
+    //       const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+      
+    //       for (const orderData of data) {
+    //         const user = users[Math.floor(Math.random() * users.length)];
+      
+    //         const products = await this.productsRepository.find({
+    //           where: { id: In(orderData.products) },
+    //         });
+      
+    //         const orderDetails = new OrderDetails();
+    //         orderDetails.price = orderData.price;
+    //         orderDetails.products = products;
+      
+    //         await this.orderDetailsRepository.save(orderDetails);
+      
+    //         const order = new Orders();
+    //         order.date = new Date(orderData.date);
+    //         order.user = user;
+    //         order.orderdetails = orderDetails;
+      
+    //         await this.ordersRepository.save(order);
+    //       }
+      
+    //       return 'Orders seeded successfully!';
+    //     } catch (error) {
+    //       console.error('Error seeding orders:', error);
+    //       throw new Error('Failed to seed orders.');
+    //     }
+    //   }
     async addOrder(userId:string,products:any){
         let total=0
 

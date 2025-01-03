@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoriesRepository } from 'src/categories/categories.repository';
+import { ordersRepository } from 'src/orders/orders.repository';
 import { ProductsRepository } from 'src/products/products.repository';
 import { UserRepository } from 'src/users/users.repository';
 
@@ -13,6 +14,8 @@ export class SeedersService {
         private readonly productsRepository: ProductsRepository,
 
         private readonly usersRepository: UserRepository,
+
+        private readonly ordersRepository: ordersRepository,
     ){}
     async seed() {
         console.log('Seeding categories...');
@@ -23,7 +26,10 @@ export class SeedersService {
 
         console.log('Seeding Users...');
         await this.usersRepository.seedUsers();
-    
+
+        console.log('Seeding Orders...');
+        await this.ordersRepository.seedOrders();
+
         console.log('Seeding completed!');
       }
 }

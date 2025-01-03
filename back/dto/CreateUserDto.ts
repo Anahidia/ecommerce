@@ -57,8 +57,4 @@ export class CreateUserDto {
   @IsOptional()
   isAdmin?: boolean;
 
-  // Campo para Google
-  @ApiProperty({ example: 'google-unique-id', required: false })
-  @IsOptional()
-  googleId?: string; // Este campo será opcional para usuarios que se registren con Google
 }
