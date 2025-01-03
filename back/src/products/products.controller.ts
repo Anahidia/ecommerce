@@ -16,7 +16,6 @@ export class ProductsController {
   @Get()
   @ApiOperation({ summary: 'Obtener una lista de productos' })
   @ApiResponse({ status: 200, description: 'Productos retornados correctamente.' })
-  
   getProducts(@Query('page')page:number=1,@Query('limit')limit:number=5) {
   if(page && limit ) return this.productService.getProductsService(page,limit)
     return this.productService.getProductsService(Number(page),Number(limit));

@@ -24,11 +24,11 @@ export class SeedersService {
         console.log('Seeding products...');
         await this.productsRepository.createProduct();
 
-        console.log('Seeding Users...');
-        await this.usersRepository.seedUsers();
+      //  console.log('Seeding Users...');
+       // await this.usersRepository.seedUsers();
 
-        console.log('Seeding Orders...');
-        await this.ordersRepository.seedOrders();
+       // console.log('Seeding Orders...');
+        //await this.ordersRepository.seedOrders();
 
         console.log('Seeding completed!');
       }
