@@ -5,8 +5,8 @@ import {  ProductsRepository } from './products.repository';
 @Injectable()
 export class ProductsService {
   constructor(private readonly productsRepository: ProductsRepository) {}
-  getProductsService(page:number,limit:number) {
-  return this.productsRepository.getProducts(page,limit)
+  getProductsService() {
+  return this.productsRepository.getProducts()
   }
   getProductByIdService(id:string){
     return this.productsRepository.getProductsById(id)

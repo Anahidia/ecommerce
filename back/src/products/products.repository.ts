@@ -15,15 +15,12 @@ export class ProductsRepository {
     private categoriesRepository:Repository<Categories>
   ){}
 
-async  getProducts(page:number,limit:number):Promise<Products[]> {
+async  getProducts():Promise<Products[]> {
  let products =await this.productsRepository.find({
   relations:{
     category:true
   }
  })
- const start =(page -1)* limit
- const end=start+limit
- products=products.slice(start, end)
  return products;
   }
  async getProductsById(id:string){
@@ -34,32 +31,62 @@ async  getProducts(page:number,limit:number):Promise<Products[]> {
   }
 
 
-  async  createProduct(){
- const categories=await this.categoriesRepository.find()
- data?.map(async (element)=>{
-  const category= categories.find(
-    (category)=> category.name === element.category
-  )
-  const product=new Products()
-
-  product.name=element.name
-  product.description=element.description
-  product.price=element.price
-  product.stock=element.stock
-  product.imgUrl=element.imgUrl
-  product.category=category
-
-  await this.productsRepository
-  .createQueryBuilder()
-  .insert()
-  .into(Products)
-  .values(product)
-  .orUpdate(['description','price','stock','imgUrl'],['name'])
-  .execute()
- })
-
-return 'productos agreagdos'    
+  async createProduct() {
+    const categories = await this.categoriesRepository.find();
+  
+    for (const element of data) {
+      // Buscar la categoría en la lista obtenida de la base de datos
+      const categoryName = element.category; // Aquí 'category' es un string
+      let category;
+  
+      if (categoryName) {
+        category = categories.find((cat) => cat.name === categoryName);
+  
+        if (!category) {
+          console.warn(`Category '${categoryName}' not found in the database for product: ${element.name}.`);
+        }
+      } else {
+        console.warn(`No category provided for product: ${element.name}.`);
+      }
+  
+      // Si la categoría es null, asignar 'uncategorized'
+      if (!category) {
+        category = categories.find((cat) => cat.name === 'uncategorized');
+  
+        if (!category) {
+          console.log(`Creating default 'uncategorized' category.`);
+          category = await this.categoriesRepository.save({
+            name: 'uncategorized',
+          });
+          categories.push(category); // Actualizar la lista de categorías
+        }
+      }
+  
+      const product = new Products();
+      product.name = element.name;
+      product.description = element.description;
+      product.price = element.price;
+      product.stock = element.stock;
+      product.imgUrl = element.imgUrl;
+      product.category = category;
+  
+      try {
+        await this.productsRepository
+          .createQueryBuilder()
+          .insert()
+          .into(Products)
+          .values(product)
+          .orUpdate(['description', 'price', 'stock', 'imgUrl'], ['name'])
+          .execute();
+        console.log(`Product '${product.name}' added/updated successfully.`);
+      } catch (error) {
+        console.error(`Failed to add/update product: ${product.name}`, error);
+      }
+    }
+  
+    return 'Productos agregados';
   }
+  
 
   async upDateProducts(id:string,product:Products){
   await this.productsRepository.update(id,product)

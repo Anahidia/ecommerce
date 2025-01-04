@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Orders } from "./orders.entities";
 import { ApiProperty } from '@nestjs/swagger';
+import { Rol } from "src/rol.enum";
 
 @Entity({ name: "users" })
 export class Users {
@@ -62,12 +63,14 @@ export class Users {
     })
     city: string;
 
-    @ApiProperty({ description: 'Admin status of the user', type: Boolean, default: false })
     @Column({
-        type: "boolean",
-        default: false
+        type: 'varchar',
+        length: 16,
+        nullable: false,
+        default: Rol.User, 
     })
-    isAdmin: boolean;
+    @ApiProperty({ description: 'Role of the user', enum: Rol })
+    role: Rol;
 
     @ApiProperty({ description: 'Google ID of the user', type: String, required: false })
     @Column({
@@ -83,18 +86,7 @@ export class Users {
         nullable: false,
         default: 'form',
       })
-// @ApiProperty({
-//     description: 'Authentication method used by the user',
-//     enum: ['google', 'googleIncomplete', 'form'],
-//     default: 'form',
-//   })
-//   auth: 'google' | 'googleIncomplete' | 'form'
-//     @ApiProperty({ description: 'Authentication provider of the user', type: String, default: 'local' })
-//     @Column({
-//         type: "varchar",
-//         default: "local" // Alternativas: "google", "facebook", etc.
-//     })
-//     authProvider: string;
+
 
     @ApiProperty({ description: 'Orders associated with the user', type: () => [Orders] })
     @OneToMany(() => Orders, (orders) => orders.user)

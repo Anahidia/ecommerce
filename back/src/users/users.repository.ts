@@ -7,6 +7,7 @@ import * as bcrypt from 'bcryptjs';
 import * as fs from 'fs';
 import * as path from 'path';
 import { CreateUserDto } from 'dto/CreateUserDto';
+import { Rol } from 'src/rol.enum';
 
 @Injectable()
 export class UserRepository {
@@ -17,41 +18,44 @@ export class UserRepository {
 
   async seedUsers() {
     const filePath = path.join(process.cwd(), 'src', 'utils', 'userSeeder.json');
-
-    // Leer el archivo JSON
+  
+   
     const data = JSON.parse(readFileSync(filePath, 'utf-8'));
-
-    // Insertar los usuarios en la base de datos
+  
+   
     await Promise.all(
       data.map(async (element) => {
         const user = new Users();
         user.name = element.name;
         user.email = element.email;
-
-        // Hashear la contraseña antes de asignarla
+  
+       
         const hashedPassword = await bcrypt.hash(element.password, 10);
         user.password = hashedPassword;
-
+  
         user.phone = element.phone;
         user.address = element.address;
         user.country = element.country;
         user.city = element.city;
-        user.isAdmin = element.isAdmin || false;  // Asignar 'false' si no se especifica el campo
-
-        // Crear o actualizar el usuario
+        
+       
+        user.role = element.role || Rol.User;
+  
+ 
         await this.usersRepository
           .createQueryBuilder()
           .insert()
           .into(Users)
           .values(user)
-          .orUpdate(['name', 'password', 'phone', 'address', 'country', 'city', 'isAdmin'], ['email'])
+          .orUpdate(['name', 'password', 'phone', 'address', 'country', 'city', 'role'], ['email'])
           .execute();
       }),
     );
-
+  
     return 'Usuarios agregados';
   }
-  // Obtener todos los usuarios con paginación
+  
+ 
   async getUsers(page: number, limit: number) {
     const skip = (page - 1) * limit;
     const [users, total] = await this.usersRepository.findAndCount({
@@ -67,14 +71,14 @@ export class UserRepository {
     };
   }
 
-  // Obtener usuario por correo electrónico
+  
   async getUsersByEmail(email: string) {
     const user = await this.usersRepository.findOne({ where: { email } });
     if (!user) throw new NotFoundException(`Usuario con email ${email} no encontrado`);
     return user;
   }
 
-  // Obtener usuario por Google ID
+  
   async getUserByGoogleId(googleId: string) {
     const user = await this.usersRepository.findOne({ where: { googleId } });
     if (!user) throw new NotFoundException(`Usuario con Google ID ${googleId} no encontrado`);
@@ -107,22 +111,38 @@ export class UserRepository {
     return userWithoutPassword;
   }
 
-  // Asignar un rol de admin a un usuario
-  async assignAdminRole(email: string, currentUserId: string) {
+  
+  async assignRole(email: string, currentUserId: string, newRole: Rol) {
     const currentUser = await this.usersRepository.findOne({ where: { id: currentUserId } });
-    if (!currentUser || !currentUser.isAdmin) {
-      throw new ForbiddenException('No tienes permisos para asignar roles de admin');
+    
+    if (!currentUser || currentUser.role !== Rol.Admin) {
+      throw new ForbiddenException('No tienes permisos para asignar roles');
     }
-
+  
     const userToUpdate = await this.usersRepository.findOne({ where: { email } });
     if (!userToUpdate) throw new NotFoundException('Usuario no encontrado');
-    if (userToUpdate.isAdmin) throw new ForbiddenException('Este usuario ya es administrador');
-
-    userToUpdate.isAdmin = true;
+    
+    if (userToUpdate.role === newRole) {
+      throw new ForbiddenException(`Este usuario ya tiene el rol de ${newRole}`);
+    }
+  
+    userToUpdate.role = newRole;
+  
     return await this.usersRepository.save(userToUpdate);
   }
+  
+  async setRoleToSeller(userId: string): Promise<Users> {
+    const user = await this.usersRepository.findOneBy({ id: userId });
 
-  // Actualizar usuario
+    if (!user) {
+        throw new Error('User not found');
+    }
+
+    user.role = Rol.Seller;
+    await this.usersRepository.save(user);
+    return user;
+}
+  
   async updateUser(id: string, upUser: Partial<Users>): Promise<Partial<Users>> {
     const existingUser = await this.usersRepository.findOne({ where: { id } });
     if (!existingUser) throw new NotFoundException(`Usuario con id ${id} no encontrado`);
@@ -135,7 +155,6 @@ export class UserRepository {
     return userWithoutPassword;
   }
 
-  // Eliminar usuario
   async deleteUser(id: string) {
     const user = await this.usersRepository.findOneBy({ id });
     if (!user) throw new NotFoundException(`Usuario con id ${id} no encontrado`);

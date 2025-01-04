@@ -20,9 +20,13 @@ export class SeedersService {
     async seed() {
         console.log('Seeding categories...');
         await this.categoriesRepository.addCategories();
+
+        console.log('categories added');
     
         console.log('Seeding products...');
         await this.productsRepository.createProduct();
+
+        console.log('products added');
 
       //  console.log('Seeding Users...');
        // await this.usersRepository.seedUsers();

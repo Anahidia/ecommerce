@@ -49,7 +49,7 @@ export class AuthService {
       throw new BadRequestException('Invalid credentials');
     }
 
-    const payload = { id: user.id, email: user.email, isAdmin: user.isAdmin };
+    const payload = { id: user.id, email: user.email, isAdmin: user.role };
     const token = this.jwtService.sign(payload);
 
     return { token };
@@ -62,7 +62,7 @@ export class AuthService {
       throw new BadRequestException('Invalid credentials');
     }
 
-    const payload = { id: user.id, email: user.email, isAdmin: user.isAdmin };
+    const payload = { id: user.id, email: user.email, isAdmin: user.role };
     const token = this.jwtService.sign(payload);
 
     return { token };

@@ -53,13 +53,13 @@ export class UsersController {
     return this.UsersService.getUserByIdService(id) 
   }
   
-  @Put('assign-admin/:email')
-  @Roles(Rol.Admin)
-  @UseGuards(AuthGuard, RolesGuard) 
-  async assignAdminRole(@Param('email') email: string, @Request() req) {
-    const currentUserId = req.user.id
-    return this.UsersService.createAdminService(email, currentUserId)
-    }
+  // @Put('assign-admin/:email')
+  // @Roles(Rol.Admin)
+  // @UseGuards(AuthGuard, RolesGuard) 
+  // async assignAdminRole(@Param('email') email: string, @Request() req) {
+  //   const currentUserId = req.user.id
+  //   return this.UsersService.createAdminService(email, currentUserId)
+  //   }
 
 
 

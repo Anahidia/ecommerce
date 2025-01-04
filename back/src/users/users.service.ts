@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from './users.repository';
+import { Rol } from 'src/rol.enum';
 
 @Injectable()
 export class UsersService {
@@ -13,8 +14,8 @@ export class UsersService {
   createUserService(user){
  return this.UsersRepository.createUser(user)
   }
-  async createAdminService(email:string,currentUserId:string){
-  return this.UsersRepository.assignAdminRole(email,currentUserId)
+  async createAdminService(email:string,currentUserId:string,newRole:Rol){
+  return this.UsersRepository.assignRole(email,currentUserId,newRole)
   }
   updateUserService(id:string, upUser){
 return this.UsersRepository.updateUser(id,upUser)

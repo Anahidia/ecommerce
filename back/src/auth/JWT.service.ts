@@ -46,7 +46,7 @@ export class JsonWebTokenService {
       id: user.id,
       name: user.name,
       email: user.email,
-      roles: user.isAdmin,
+      roles: user.role,
       phone: user.phone,
       country: user.country,
       address: user.address,
